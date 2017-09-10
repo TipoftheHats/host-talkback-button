@@ -1,10 +1,10 @@
 // Any dependencies, notably the event emitter utility
-var util = require('util');
-var EventEmitter = require('events').EventEmitter;
+const util = require('util');
+const EventEmitter = require('events').EventEmitter;
 
 // Constructor function to instantiate the hardware object
-function Button (hardware, callback) {
-	var self = this;
+function Button(hardware, callback) {
+	const self = this;
 
 	// Set hardware connection of the object
 	self.hardware = hardware;
@@ -14,31 +14,31 @@ function Button (hardware, callback) {
 	self.pressed = false;
 
 	// Begin listening for events
-	self.hardware.on('fall', function () {
+	self.hardware.on('fall', () => {
 		self._press();
 	});
 
-	self.hardware.on('rise', function () {
+	self.hardware.on('rise', () => {
 		self._release();
 	});
 
 	// Make sure the events get emitted, even if late
-	setInterval(function () {
-		self.hardware.read(function(err, value) {
-			if ( err && (err != 0 && err != 1) ) {
+	setInterval(() => {
+		self.hardware.read((err, value) => {
+			/* eslint-disable eqeqeq */
+			if (err && (err != 0 && err != 1)) {
 				console.log(err);
-			}
-			else if ( err == 0 || value == 0 ) {
+			} else if (err == 0 || value == 0) {
 				self._press();
-			}
-			else {
+			} else {
 				self._release();
 			}
+			/* eslint-enable eqeqeq */
 		});
 	}, self.delay);
 
 	// Emit the ready event when everything is set up
-	setImmediate(function emitReady() {
+	setImmediate(() => {
 		self.emit('ready');
 	});
 	// Call the callback with object
@@ -51,25 +51,23 @@ function Button (hardware, callback) {
 util.inherits(Button, EventEmitter);
 
 Button.prototype._press = function () {
-	var self = this;
-
-	if(!self.pressed) {
+	const self = this;
+	if (!self.pressed) {
 		self.emit('press');
 		self.pressed = true;
 	}
-}
+};
 
 Button.prototype._release = function () {
-	var self = this;
-
-	if(self.pressed) {
+	const self = this;
+	if (self.pressed) {
 		self.emit('release');
 		self.pressed = false;
 	}
-}
+};
 
 // Use function which calls the constructor
-function use (hardware, callback) {
+function use(hardware, callback) {
 	return new Button(hardware, callback);
 }
 

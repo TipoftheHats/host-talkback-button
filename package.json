@@ -1,17 +1,25 @@
 {
   "name": "host-talkback-button",
   "version": "0.0.0",
+  "scripts": {
+    "test": "eslint .",
+    "prebuild": "npm t",
+    "build": "babel src -d lib",
+    "prepush": "npm run build",
+    "push": "t2 push index.js",
+    "prerun": "npm run build",
+    "run": "t2 run index.js"
+  },
   "description": "Tessel project",
-  "main": "index.js",
+  "main": "lib\\index.js",
   "dependencies": {
     "osc": "lange/osc.js#remove-serialport"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
     "eslint": "^4.6.1",
     "eslint-config-xo": "^0.18.2"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "www.github.com/tessel/t2-cli",
   "keywords": [
