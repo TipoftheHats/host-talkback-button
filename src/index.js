@@ -27,7 +27,7 @@ const ledPin = tessel.port.B.pin[0];
 const udpPort = new osc.UDPPort({
 	localAddress: '0.0.0.0',
 	localPort: LOCAL_PORT,
-	remoteAddress: '192.168.1.209',
+	remoteAddress: '172.30.10.35',
 	remotePort: X32_UDP_PORT,
 	metadata: true
 });
@@ -48,6 +48,7 @@ aButton.on('ready', () => {
 		if (state.testMode) {
 			turnLedOn();
 		} else {
+			state.hostMicAlreadyMuted = !state.hostMicOn;
 			udpPort.send({
 				address: `/ch/${HOST_MIC_CH}/mix/on`,
 				args: [{type: 'i', value: 0}]
@@ -69,10 +70,14 @@ aButton.on('ready', () => {
 		if (state.testMode) {
 			turnLedOff();
 		} else {
-			udpPort.send({
-				address: `/ch/${HOST_MIC_CH}/mix/on`,
-				args: [{type: 'i', value: 1}]
-			});
+			// Don't unmute the host mic on main if it was already muted before the button was pressed.
+			if (!state.hostMicAlreadyMuted) {
+				udpPort.send({
+					address: `/ch/${HOST_MIC_CH}/mix/on`,
+					args: [{type: 'i', value: 1}]
+				});
+			}
+
 			udpPort.send({
 				address: `/auxin/${HOST_TALKBACK_AUXIN_CH}/mix/on`,
 				args: [{type: 'i', value: 0}]
